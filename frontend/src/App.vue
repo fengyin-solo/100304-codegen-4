@@ -11,7 +11,15 @@
     <main class="app-main">
       <header class="app-head">
         <span class="head-desc">面向通信基站站点入网、动力环境监控、天馈巡检、发电保障与退网拆站的一体化基站运维管理后台。</span>
-        <span class="head-user">当前值班：{{ store.operator }} · {{ store.shiftLabel }}</span>
+        <span class="head-user">
+          当前值班：{{ store.operator }} · {{ store.shiftLabel }}
+          <label class="role-switch">
+            角色
+            <select :value="store.role" @change="onRoleChange">
+              <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
+            </select>
+          </label>
+        </span>
       </header>
       <RouterView />
     </main>
@@ -19,9 +27,25 @@
 </template>
 
 <script setup lang="ts">
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore, ROLES, type Role } from '@/stores/session'
 
 const store = useSessionStore()
+const roles = ROLES
 
-const navItems = [{ label: "运营概览", path: "/" }, { label: "基站台账", path: "/site" }, { label: "铁塔管理", path: "/tower" }, { label: "动力配套", path: "/power" }, { label: "蓄电池组", path: "/battery" }, { label: "发电机组", path: "/genset" }, { label: "开关电源", path: "/rectifier" }, { label: "空调管理", path: "/ac" }, { label: "天馈系统", path: "/antenna" }, { label: "传输设备", path: "/transmission" }, { label: "馈线巡检", path: "/feeder" }, { label: "防雷接地", path: "/lightningprot" }, { label: "消防设施", path: "/firealarm" }, { label: "门禁管理", path: "/dooraccess" }, { label: "巡检作业", path: "/patrol" }, { label: "油料管理", path: "/fuel" }, { label: "场租合同", path: "/rental" }, { label: "电费管理", path: "/electricbill" }, { label: "拆站管理", path: "/demolition" }, { label: "应急通信", path: "/emergency" }, { label: "节能改造", path: "/energyeff" }]
+function onRoleChange(event: Event) {
+  store.setRole((event.target as HTMLSelectElement).value as Role)
+}
+
+const navItems = [{ label: "运营概览", path: "/" }, { label: "基站台账", path: "/site" }, { label: "铁塔管理", path: "/tower" }, { label: "动力配套", path: "/power" }, { label: "蓄电池组", path: "/battery" }, { label: "发电机组", path: "/genset" }, { label: "开关电源", path: "/rectifier" }, { label: "空调管理", path: "/ac" }, { label: "天馈系统", path: "/antenna" }, { label: "传输设备", path: "/transmission" }, { label: "馈线巡检", path: "/feeder" }, { label: "防雷接地", path: "/lightningprot" }, { label: "消防设施", path: "/firealarm" }, { label: "门禁管理", path: "/dooraccess" }, { label: "巡检作业", path: "/patrol" }, { label: "油料管理", path: "/fuel" }, { label: "场租合同", path: "/rental" }, { label: "电费管理", path: "/electricbill" }, { label: "拆站管理", path: "/demolition" }, { label: "应急通信", path: "/emergency" }, { label: "节能改造", path: "/energyeff" }, { label: "电磁环境备案", path: "/emfiling" }]
 </script>
+
+<style scoped>
+.role-switch {
+  margin-left: 12px;
+  font-size: 13px;
+}
+.role-switch select {
+  margin-left: 6px;
+  padding: 2px 6px;
+}
+</style>

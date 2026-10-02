@@ -70,7 +70,7 @@ import { request } from '@/api/client'
 type Row = Record<string, string | number | null>
 
 const ENDPOINT = '/api/site'
-const columns = ["基站编号", "基站名称", "基站类型", "所属区县", "经纬度坐标", "铁塔高度", "入网日期", "基站状态"]
+const columns = ["基站编号", "基站名称", "基站类型", "所属区县", "经纬度坐标", "铁塔高度", "入网日期", "基站状态", "备案合规栏"]
 const actions = ["登记退服", "申请退网", "拆站完成"]
 const statuses = ["运行中", "退服中", "已退网", "已拆除"]
 const stats = [{"label": "运行基站", "value": 0}, {"label": "退服基站", "value": 0}, {"label": "退网站点", "value": 0}]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.emfiling import SITE_NO_FILING, emfiling_service
 from app.store import store
 
 MODULE = "site"
@@ -10,6 +11,15 @@ REQUIRED_FIELDS = ["基站编号", "基站名称", "基站类型"]
 STATUS_ORDER = ["运行中", "退服中", "已退网", "已拆除"]
 ACTION_RULES = {"登记退服": "退服中", "申请退网": "已退网", "拆站完成": "已拆除"}
 NEGATIVE_ACTIONS = []
+
+
+def _with_compliance(row: dict[str, Any]) -> dict[str, Any]:
+    """台账行补「备案合规栏」：结论只认电磁环境备案模块的统一出口。"""
+    result = dict(row)
+    compliance = emfiling_service.site_compliance(str(row.get("基站编号", "")))
+    result["备案合规栏"] = compliance["合规栏"] if compliance["备案状态"] else SITE_NO_FILING
+    result["备案结论"] = compliance["备案结论"]
+    return result
 
 
 class SiteService:
@@ -28,10 +38,12 @@ class SiteService:
             rows = [row for row in rows if row.get("status") == status]
         total = len(rows)
         start = max(page - 1, 0) * size
-        return rows[start:start + size], total
+        page_rows = [_with_compliance(row) for row in rows[start:start + size]]
+        return page_rows, total
 
     def get_entry(self, entry_id: int) -> dict[str, Any] | None:
-        return store.find(MODULE, entry_id)
+        row = store.find(MODULE, entry_id)
+        return _with_compliance(row) if row else None
 
     def create_entry(self, values: dict[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
         missing = [field for field in REQUIRED_FIELDS if not str(values.get(field) or "").strip()]
