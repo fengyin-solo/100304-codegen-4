@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 from app.routers import site as router_site
+from app.routers import auth as router_auth
+from app.routers import emr as router_emr
 from app.routers import tower as router_tower
 from app.routers import power as router_power
 from app.routers import battery as router_battery
@@ -27,4 +29,4 @@ from app.routers import demolition as router_demolition
 from app.routers import emergency as router_emergency
 from app.routers import energyeff as router_energyeff
 
-ROUTERS = [router_site, router_tower, router_power, router_battery, router_genset, router_rectifier, router_ac, router_antenna, router_transmission, router_feeder, router_lightningprot, router_firealarm, router_dooraccess, router_patrol, router_fuel, router_rental, router_electricbill, router_demolition, router_emergency, router_energyeff]
+ROUTERS = [router_auth, router_site, router_emr, router_tower, router_power, router_battery, router_genset, router_rectifier, router_ac, router_antenna, router_transmission, router_feeder, router_lightningprot, router_firealarm, router_dooraccess, router_patrol, router_fuel, router_rental, router_electricbill, router_demolition, router_emergency, router_energyeff]

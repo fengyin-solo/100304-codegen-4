@@ -28,10 +28,24 @@ class SiteService:
             rows = [row for row in rows if row.get("status") == status]
         total = len(rows)
         start = max(page - 1, 0) * size
-        return rows[start:start + size], total
+        page_rows = [self._with_compliance(dict(row)) for row in rows[start:start + size]]
+        return page_rows, total
 
     def get_entry(self, entry_id: int) -> dict[str, Any] | None:
-        return store.find(MODULE, entry_id)
+        row = store.find(MODULE, entry_id)
+        return self._with_compliance(dict(row)) if row else None
+
+    @staticmethod
+    def _with_compliance(row: dict[str, Any]) -> dict[str, Any]:
+        """合规栏不在这里另算：直接取电磁环境备案的唯一结论，保证两个入口同源。"""
+        from app.services.emr import emr_service
+        compliance = emr_service.site_compliance(str(row.get("基站编号", "")))
+        row["电磁合规栏"] = compliance.get("合规栏")
+        row["备案状态"] = compliance.get("备案状态")
+        row["备案结论"] = compliance.get("备案结论")
+        row["现行符合性"] = compliance.get("现行符合性")
+        row["备案编号"] = compliance.get("备案编号")
+        return row
 
     def create_entry(self, values: dict[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
         missing = [field for field in REQUIRED_FIELDS if not str(values.get(field) or "").strip()]

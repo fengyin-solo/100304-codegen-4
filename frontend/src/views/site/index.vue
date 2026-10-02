@@ -31,12 +31,17 @@
       <thead>
         <tr>
           <th v-for="column in columns" :key="column">{{ column }}</th>
+          <th>电磁合规栏</th>
           <th>可执行动作</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in rows" :key="String(row.id)">
           <td v-for="column in columns" :key="column">{{ row[column] ?? '—' }}</td>
+          <td>
+            <span class="compliance-tag" :class="complianceClass(String(row['电磁合规栏']))">{{ row['电磁合规栏'] ?? '待备案' }}</span>
+            <div class="compliance-sub">{{ row['备案状态'] }}<template v-if="row['备案编号']"> · {{ row['备案编号'] }}</template></div>
+          </td>
           <td class="row-actions">
             <button
               v-for="action in actions"
@@ -50,7 +55,7 @@
           </td>
         </tr>
         <tr v-if="!rows.length">
-          <td :colspan="columns.length + 1" class="empty-state">暂无基站台账数据，可先登记基站</td>
+          <td :colspan="columns.length + 2" class="empty-state">暂无基站台账数据，可先登记基站</td>
         </tr>
       </tbody>
     </table>
@@ -84,6 +89,13 @@ const filterFields = columns.slice(0, 3)
 function resetFilters() {
   filters.value = {}
   void reload()
+}
+
+function complianceClass(value: string) {
+  if (value === '合格') return 'cp-pass'
+  if (value === '不合格') return 'cp-fail'
+  if (value === '已失效') return 'cp-expired'
+  return 'cp-pending'
 }
 
 function exportRows() {
@@ -128,3 +140,12 @@ async function reload() {
 
 onMounted(reload)
 </script>
+
+<style scoped>
+.compliance-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); background: #f1f5f9; }
+.cp-pass { background: #dcfce7; border-color: #86efac; color: #15803d; }
+.cp-fail { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+.cp-expired { background: #e2e8f0; color: #475569; }
+.cp-pending { background: #fef9c3; border-color: #fde047; color: #a16207; }
+.compliance-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+</style>
